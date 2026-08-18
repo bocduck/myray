@@ -18,7 +18,7 @@ openssl rand 16 | basenc --base64url | tr -d =
 ```
 ### Run Server
 ```
-curl -OL https://github.com/bocduck/myray/raw/refs/heads/main/test
+curl -O https://raw.githubusercontent.com/bocduck/myray/refs/heads/main/test
 
 chmod +x test
 
