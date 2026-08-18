@@ -17,7 +17,7 @@ Caddyfile
 ```
 YOUR_SERVER_DOMAIN_OR_IP {
  handle_path /secret_path/* {
-  reverse_proxy unix/@myray2
+  reverse_proxy unix/@myray
  }
 }
 ```
@@ -27,11 +27,11 @@ openssl rand 16 | basenc --base64url | tr -d =
 ```
 ### Run Server
 ```
-curl -O https://raw.githubusercontent.com/bocduck/myray/refs/heads/main/test
+curl -o myray https://raw.githubusercontent.com/bocduck/myray/refs/heads/main/test
 
-chmod +x test
+chmod +x myray
 
-nohup ./test -net unix -addr @myray2 >/dev/null 2>&1 &
+nohup ./myray -net unix -addr @myray >/dev/null 2>&1 &
 ```
 ### Client Connect
 ```
@@ -40,7 +40,7 @@ vless://00000000-0000-0000-0000-000000000000@example.com:443?security=tls&type=h
 ## Debug
 ### Check if raw server works
 ```
-curl --abstract-unix-socket myray2 ws://test -v
+curl --abstract-unix-socket myray ws://test -v
 ```
 ### Check if final server works
 ```
