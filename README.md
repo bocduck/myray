@@ -8,8 +8,10 @@
 ### Setup Web TLS Reverse Proxy
 Add proxy to your website block in caddy web server
 ```
-handle_path /secret_path/* {
- reverse_proxy unix/@myray2
+example.com {
+ handle_path /secret_path/* {
+  reverse_proxy unix/@myray2
+ }
 }
 ```
 You may want replace secret_path with real secret, generate one using the code below
