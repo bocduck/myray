@@ -50,7 +50,7 @@ curl wss://example.com/secret_path -v
 ```
 mkdir test
 cd test
-curl -o main.go https://raw.githubusercontent.com/bocduck/myray/refs/heads/main/main.txt
+curl -o main.go https://raw.githubusercontent.com/bocduck/myray/refs/heads/main/main.go
 go mod init test
 CGO_ENABLED=0 go build -trimpath -ldflags="-s -w"
 ```
