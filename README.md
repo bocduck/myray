@@ -5,10 +5,10 @@
 >以下代码是一个最简go vless httpupgrade transport 服务端实现，其以反代形式工作在安全的tls web服务器背后，且在反代层以path做了安全认证，与现有客户端兼容。审计有无安全问题、性能问题。
 
 ## Usage
-### Setup Web TLS Reverse Proxy
-Add proxy to your website block in caddy web server
+### Setup Caddy Web TLS Reverse Proxy
+Caddyfile
 ```
-example.com {
+YOUR_SERVER_DOMAIN_OR_IP {
  handle_path /secret_path/* {
   reverse_proxy unix/@myray2
  }
