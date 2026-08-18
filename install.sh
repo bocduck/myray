@@ -1,4 +1,5 @@
 cd
+pkill mycaddy
 pkill myray
 rm -rf myray
 mkdir myray
