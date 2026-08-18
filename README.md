@@ -14,31 +14,28 @@ go mod init test
 CGO_ENABLED=0 go build -trimpath -ldflags="-s -w"
 ```
 ### Usage
-Run Server:
-
+#### Run Server
 ```
 ./test -net unix -addr @myray2
 ```
-Setup Proxy:
-
+#### Setup Proxy
 add proxy to your website block in caddy web server
 ```
 handle_path /secret_path/* {
  reverse_proxy unix/@myray2
 }
 ```
-Secret Path:
-
+#### Secret Path
 You may want replace secret_path with real secret, generate one using the code below
 ```
 openssl rand 16 | basenc --base64url | tr -d =
 ```
 ### Debug
-Check if raw server works: 
+#### Check if raw server works
 ```
 curl --abstract-unix-socket myray2 ws://test -v
 ```
-Check if final server works: 
+#### Check if final server works
 ```
 curl wss://example.com/secret_path -v
 ```
