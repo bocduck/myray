@@ -7,7 +7,7 @@ cd myray
 mkdir html
 
 export MYRAY_IPV4=$(curl -s4 ip.sb)
-export MYRAY_IPV6=$(curl -s6 ip.sb)
+export MYRAY_IPV6=$(curl -s6m 5 ip.sb)
 export MYRAY_RAND=$(openssl rand 16 | basenc --base64url | tr -d =)
 
 curl -Lo tmp.tar.gz https://github.com/caddyserver/caddy/releases/download/v2.11.4/caddy_2.11.4_linux_amd64.tar.gz
