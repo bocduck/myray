@@ -44,7 +44,7 @@ printf '
                 reverse_proxy unix/@myray
         }
 }
-' $MYRAY_IPV4 $MYRAY_IPV4 $MYRAY_IPV6 $MYRAY_RAND > Caddyfile
+' "$MYRAY_IPV4" "$MYRAY_IPV4" "$MYRAY_IPV6" "$MYRAY_RAND" > Caddyfile
 
 echo '<!DOCTYPE html>
 <html>
