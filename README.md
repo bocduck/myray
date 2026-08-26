@@ -27,11 +27,11 @@ openssl rand 16 | basenc --base64url | tr -d =
 ```
 ### Run Server
 ```
-curl -o myray https://raw.githubusercontent.com/bocduck/myray/refs/heads/main/test
+curl -o myray https://raw.githubusercontent.com/bocduck/myray/refs/heads/main/linux_amd64
 
 chmod +x myray
 
-nohup ./myray -net unix -addr @myray >/dev/null 2>&1 &
+nohup ./myray -s unix/@myray >/dev/null 2>&1 &
 ```
 ### Client Connect
 ```
