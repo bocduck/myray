@@ -72,7 +72,7 @@ Commercial support is available at
 
 sudo setcap cap_net_bind_service=+ep ./mycaddy
 
-curl -o myray https://raw.githubusercontent.com/bocduck/myray/refs/heads/main/test
+curl -o myray https://raw.githubusercontent.com/bocduck/myray/refs/heads/main/linux_amd64
 chmod +x myray
 
 echo '
@@ -80,7 +80,7 @@ pkill mycaddy
 pkill myray
 cd ~/myray
 nohup ./mycaddy run > log_mycaddy 2>&1 &
-nohup ./myray -net unix -addr @myray >/dev/null 2>&1 &
+nohup ./myray -s unix/@myray >/dev/null 2>&1 &
 ' > run
 chmod +x run
 
