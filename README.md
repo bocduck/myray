@@ -35,7 +35,7 @@ nohup ./myray -s unix/@myray -path /secret_path >/dev/null 2>&1 &
 ```
 ### Client Connect
 ```
-vless://00000000-0000-0000-0000-000000000000@example.com:443?security=tls&type=httpupgrade&path=%2F$secret_path%2F&sni=example.com&udp=0
+vless://00000000-0000-0000-0000-000000000000@example.com:443?security=tls&type=httpupgrade&path=%2F$secret_path&sni=example.com&udp=0
 ```
 ## Debug
 ### Check if raw server works
