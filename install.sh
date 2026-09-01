@@ -17,6 +17,7 @@ mv caddy mycaddy
 
 printf '
 {
+        admin off
         auto_https disable_redirects
         ocsp_stapling off
         servers {
