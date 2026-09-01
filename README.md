@@ -16,7 +16,7 @@ Client connect via vless link output in console
 Caddyfile
 ```
 YOUR_SERVER_DOMAIN_OR_IP {
- handle_path /secret_path/* {
+ handle /secret_path {
   reverse_proxy unix/@myray
  }
 }
@@ -31,7 +31,7 @@ curl -o myray https://raw.githubusercontent.com/bocduck/myray/refs/heads/main/li
 
 chmod +x myray
 
-nohup ./myray -s unix/@myray >/dev/null 2>&1 &
+nohup ./myray -s unix/@myray -path /secret_path >/dev/null 2>&1 &
 ```
 ### Client Connect
 ```
