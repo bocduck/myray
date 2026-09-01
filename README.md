@@ -40,7 +40,7 @@ vless://00000000-0000-0000-0000-000000000000@example.com:443?security=tls&type=h
 ## Debug
 ### Check if raw server works
 ```
-curl --abstract-unix-socket myray ws://test -v
+curl --abstract-unix-socket myray ws://test/secret_path -v
 ```
 ### Check if final server works
 ```
