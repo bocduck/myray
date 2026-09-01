@@ -40,7 +40,7 @@ printf '
         handle_errors {
                 header -Server
         }
-        handle_path /%s/* {
+        handle /%s {
                 reverse_proxy unix/@myray
         }
 }
@@ -75,13 +75,13 @@ sudo setcap cap_net_bind_service=+ep ./mycaddy
 curl -o myray https://raw.githubusercontent.com/bocduck/myray/refs/heads/main/linux_amd64
 chmod +x myray
 
-echo '
+echo "
 pkill mycaddy
 pkill myray
 cd ~/myray
 nohup ./mycaddy run > log_mycaddy 2>&1 &
-nohup ./myray -s unix/@myray >/dev/null 2>&1 &
-' > run
+nohup ./myray -s unix/@myray -path /${MYRAY_RAND} >/dev/null 2>&1 &
+" > run
 chmod +x run
 
 echo "vless://00000000-0000-0000-0000-000000000000@${MYRAY_IPV4}:443?security=tls&type=httpupgrade&path=%2F${MYRAY_RAND}%2F&sni=${MYRAY_IPV4}&udp=0"
