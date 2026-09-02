@@ -85,4 +85,9 @@ nohup ./myray -s unix/@myray -path /${MYRAY_RAND} >/dev/null 2>&1 &
 " > run
 chmod +x run
 
-echo "vless://00000000-0000-0000-0000-000000000000@${MYRAY_IPV4}:443?
+echo "vless://00000000-0000-0000-0000-000000000000@${MYRAY_IPV4}:443?security=tls&type=httpupgrade&path=%2F${MYRAY_RAND}&sni=${MYRAY_IPV4}&udp=0"
+
+echo "vless://00000000-0000-0000-0000-000000000000@[${MYRAY_IPV6}]:443?security=tls&type=httpupgrade&path=%2F${MYRAY_RAND}&sni=${MYRAY_IPV6}&udp=0"
+
+cd
+myray/run
