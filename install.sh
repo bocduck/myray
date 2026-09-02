@@ -10,7 +10,7 @@ export MYRAY_IPV4=$(curl -s4 ip.sb)
 export MYRAY_IPV6=$(curl -s6m 5 ip.sb)
 export MYRAY_RAND=$(openssl rand 16 | basenc --base64url | tr -d =)
 
-curl -Lo tmp.tar.gz https://github.com/caddyserver/caddy/releases/download/v2.11.4/caddy_2.11.4_linux_amd64.tar.gz
+if [[ "$(uname -m)" == 'aarch64' ]]; then curl -Lo tmp.tar.gz https://github.com/caddyserver/caddy/releases/download/v2.11.4/caddy_2.11.4_linux_arm64.tar.gz ; else curl -Lo tmp.tar.gz https://github.com/caddyserver/caddy/releases/download/v2.11.4/caddy_2.11.4_linux_amd64.tar.gz ; fi
 tar xf tmp.tar.gz caddy
 rm -f tmp.tar.gz
 mv caddy mycaddy
@@ -73,7 +73,7 @@ Commercial support is available at
 
 sudo setcap cap_net_bind_service=+ep ./mycaddy
 
-curl -o myray https://raw.githubusercontent.com/bocduck/myray/refs/heads/main/linux_amd64
+if [[ "$(uname -m)" == 'aarch64' ]]; then curl -Lo myray https://raw.githubusercontent.com/bocduck/myray/refs/heads/main/linux_arm64 ; else curl -Lo myray https://raw.githubusercontent.com/bocduck/myray/refs/heads/main/linux_amd64 ; fi
 chmod +x myray
 
 echo "
@@ -85,9 +85,4 @@ nohup ./myray -s unix/@myray -path /${MYRAY_RAND} >/dev/null 2>&1 &
 " > run
 chmod +x run
 
-echo "vless://00000000-0000-0000-0000-000000000000@${MYRAY_IPV4}:443?security=tls&type=httpupgrade&path=%2F${MYRAY_RAND}&sni=${MYRAY_IPV4}&udp=0"
-
-echo "vless://00000000-0000-0000-0000-000000000000@[${MYRAY_IPV6}]:443?security=tls&type=httpupgrade&path=%2F${MYRAY_RAND}&sni=${MYRAY_IPV6}&udp=0"
-
-cd
-myray/run
+echo "vless://00000000-0000-0000-0000-000000000000@${MYRAY_IPV4}:443?
