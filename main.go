@@ -48,8 +48,6 @@ func handle(c net.Conn) {
 	defer c.Close()
 
 	br := bufio.NewReader(c)
-
-	// 读取 HTTP Upgrade 请求。
 	req, err := http.ReadRequest(br)
 	if err != nil {
 		return
@@ -78,7 +76,7 @@ func handle(c net.Conn) {
 		return
 	}
 
-	// HTTP 101。
+	//HTTP 101
 	_, err = io.WriteString(c,
 		"HTTP/1.1 101 Switching Protocols\r\n"+
 			"Connection: Upgrade\r\n"+
@@ -88,75 +86,103 @@ func handle(c net.Conn) {
 		return
 	}
 
-	// Upgrade 后，br 中可能已经缓存了客户端发送的 VLESS 数据。
-	conn := &bufferedConn{
-		Conn: c,
-		r:    br,
+	host, port, err := vlessReadRequest(br)
+	if err != nil {
+		fmt.Println(err)
+		return
 	}
 
-	if err := serveVLESS(conn); err != nil {
+	target := net.JoinHostPort(host, fmt.Sprint(port))
+	fmt.Println("connect", target)
+	dst, err := net.Dial("tcp", target)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer dst.Close()
+
+	//VLESS response: Version + AddonLen + Addon
+	_, err = c.Write([]byte{0, 0})
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	//双向转发
+	errCh := make(chan error, 2)
+
+	go func() {
+		//First Read
+		//Safely drain bufio.Reader
+		_, err := io.CopyN(dst, br, int64(br.Buffered()))
+		if err != nil {
+			errCh <- err
+			return
+		}
+
+		_, err = io.Copy(dst, c)
+		errCh <- err
+	}()
+
+	go func() {
+		_, err = io.Copy(c, dst)
+		errCh <- err
+	}()
+
+	err = <-errCh
+	if err != nil {
 		fmt.Println("vless:", err)
 	}
 }
 
-type bufferedConn struct {
-	net.Conn
-	r *bufio.Reader
-}
-
-func (c *bufferedConn) Read(p []byte) (int, error) {
-	return c.r.Read(p)
-}
-
-func serveVLESS(c net.Conn) error {
+func vlessReadRequest(c *bufio.Reader) (string, uint16, error) {
 	// Version
 	var version [1]byte
 	if _, err := io.ReadFull(c, version[:]); err != nil {
-		return err
+		return "", 0, err
 	}
 
 	// UUID
 	var uid [16]byte
 	if _, err := io.ReadFull(c, uid[:]); err != nil {
-		return err
+		return "", 0, err
 	}
-	if uid!=[16]byte{} {
-		return fmt.Errorf("uuid: all zero expect but %s",uuid.UUID(uid).String())
+	if uid != [16]byte{} {
+		return "", 0, fmt.Errorf("uuid: all zero expect but %s", uuid.UUID(uid).String())
 	}
 
 	// Addon length
 	var addonLen [1]byte
 	if _, err := io.ReadFull(c, addonLen[:]); err != nil {
-		return err
+		return "", 0, err
 	}
 
 	// Addon
 	if _, err := io.CopyN(io.Discard, c, int64(addonLen[0])); err != nil {
-		return err
+		return "", 0, err
 	}
 
 	// Command
 	var cmd [1]byte
 	if _, err := io.ReadFull(c, cmd[:]); err != nil {
-		return err
+		return "", 0, err
 	}
 
 	// 1 = TCP, 2 = UDP, 3 = Mux
 	if cmd[0] != 1 {
-		return fmt.Errorf("unsupported command: %d", cmd[0])
+		return "", 0, fmt.Errorf("unsupported command: %d", cmd[0])
 	}
 
 	// Port
 	var portBuf [2]byte
 	if _, err := io.ReadFull(c, portBuf[:]); err != nil {
-		return err
+		return "", 0, err
 	}
 	port := binary.BigEndian.Uint16(portBuf[:])
 
 	// Address type
 	var atyp [1]byte
 	if _, err := io.ReadFull(c, atyp[:]); err != nil {
-		return err
+		return "", 0, err
 	}
 
 	var host string
@@ -165,60 +191,32 @@ func serveVLESS(c net.Conn) error {
 	case 1: // IPv4
 		var ip [4]byte
 		if _, err := io.ReadFull(c, ip[:]); err != nil {
-			return err
+			return "", 0, err
 		}
 		host = net.IP(ip[:]).String()
 
 	case 2: // Domain
 		var n [1]byte
 		if _, err := io.ReadFull(c, n[:]); err != nil {
-			return err
+			return "", 0, err
 		}
 
 		name := make([]byte, n[0])
 		if _, err := io.ReadFull(c, name); err != nil {
-			return err
+			return "", 0, err
 		}
 		host = string(name)
 
 	case 3: // IPv6
 		var ip [16]byte
 		if _, err := io.ReadFull(c, ip[:]); err != nil {
-			return err
+			return "", 0, err
 		}
 		host = net.IP(ip[:]).String()
 
 	default:
-		return fmt.Errorf("unsupported address type: %d", atyp[0])
+		return "", 0, fmt.Errorf("unsupported address type: %d", atyp[0])
 	}
 
-	target := net.JoinHostPort(host, fmt.Sprint(port))
-	fmt.Println("connect", target)
-
-	dst, err := net.Dial("tcp", target)
-	if err != nil {
-		return err
-	}
-	defer dst.Close()
-
-	// VLESS response:
-	// Version + AddonLen + Addon
-	if _, err := c.Write([]byte{version[0], 0}); err != nil {
-		return err
-	}
-
-	// 双向转发。
-	errCh := make(chan error, 2)
-
-	go func() {
-		_, err := io.Copy(dst, c)
-		errCh <- err
-	}()
-
-	go func() {
-		_, err := io.Copy(c, dst)
-		errCh <- err
-	}()
-
-	return <-errCh
+	return host, port, nil
 }
