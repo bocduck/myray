@@ -48,9 +48,9 @@ curl wss://example.com/secret_path -v
 ```
 ## Build
 ```
-mkdir test
-cd test
-curl -o main.go https://raw.githubusercontent.com/bocduck/myray/refs/heads/main/main.go
-go mod init test
-CGO_ENABLED=0 go build -trimpath -ldflags="-s -w"
+mkdir myray
+cd myray
+curl -OL https://raw.githubusercontent.com/bocduck/myray/refs/heads/main/main.go
+go mod init myray
+CGO_ENABLED=0 go build -trimpath -ldflags "-s -w"
 ```
